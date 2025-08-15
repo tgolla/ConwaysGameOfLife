@@ -16,7 +16,7 @@ namespace ConwaysGameOfLife.Services
     {
         public int X { get; }
         public int Y { get; }
-        public int Neighbours { get; set; }
+        public int LiveNeighbours { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BoardPoint"/> class with the specified coordinates.
@@ -27,7 +27,7 @@ namespace ConwaysGameOfLife.Services
         {
             X = x;
             Y = y;
-            Neighbours = 0;
+            LiveNeighbours = 0;
         }
 
         /// <summary>

@@ -1,15 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using ConwaysGameOfLife.Data;
-using Microsoft.EntityFrameworkCore.InMemory;
 using ConwaysGameOfLife.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.InMemory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Reflection;
 
 namespace ConwaysGameOfLife.Services.UnitTests
 {
@@ -43,10 +44,10 @@ namespace ConwaysGameOfLife.Services.UnitTests
         public void Seed_WithValidLivePoints_CreatesBoardAndLivePoints()
         {
             // Arrange
-            var dbContext = CreateInMemoryDbContext();
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeServices>>();
-            var configMock = new Mock<IConfiguration>();
-            var service = new ConwaysGameOfLifeServices(loggerMock.Object, configMock.Object, dbContext);
+            var configurationMock = new Mock<IConfiguration>();
+            var conwaysGameOfLifeServicesInstance = new ConwaysGameOfLifeServices(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
 
             var livePoints = new List<Point>
             {
@@ -57,18 +58,180 @@ namespace ConwaysGameOfLife.Services.UnitTests
             };
 
             // Act
-            var boardId = service.Seed(livePoints);
+            var boardId = conwaysGameOfLifeServicesInstance.Seed(livePoints);
 
             // Assert
-            var board = dbContext.Boards.SingleOrDefault(b => b.Id == boardId);
+            var board = conwaysGameOfLifeDbContext.Boards.SingleOrDefault(b => b.Id == boardId);
             Assert.IsNotNull(board, "Board should be created in the database.");
 
-            var storedLivePoints = dbContext.LivePoints.Where(lp => lp.BoardId == boardId).ToList();
+            var storedLivePoints = conwaysGameOfLifeDbContext.LivePoints.Where(lp => lp.BoardId == boardId).ToList();
             Assert.That(storedLivePoints.Count, Is.EqualTo(3), "All live points should be stored.");
 
             Assert.IsTrue(storedLivePoints.Any(lp => lp.X == 1 && lp.Y == 2));
             Assert.IsTrue(storedLivePoints.Any(lp => lp.X == 3 && lp.Y == 4));
             Assert.IsTrue(storedLivePoints.Any(lp => lp.X == 5 && lp.Y == 6));
+        }
+
+        [Test]
+        public void CountNeighboursForPoint_LivePointWithTwoLiveNeighbours_SetsLiveNeighboursTo2()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeServices>>();
+            var configurationMock = new Mock<IConfiguration>();
+            var conwaysGameOfLifeServicesInstance = new ConwaysGameOfLifeServices(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+
+            var livePoints = new List<Point>
+            {
+                new Point(1, 1),
+                new Point(1, 2),
+                new Point(2, 1)
+            };
+            conwaysGameOfLifeServicesInstance.Seed(livePoints);
+
+            // Use reflection to access the private method
+            var boardPoint = new BoardPoint(1, 1);
+            var method = typeof(ConwaysGameOfLifeServices)
+                .GetMethod("CountNeighboursForPoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            // Act
+            int liveNeighbours = (int)method.Invoke(conwaysGameOfLifeServicesInstance, new object[] { boardPoint });
+
+            // Assert
+            Assert.That(liveNeighbours, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void CountNeighboursForPoint_LivePointWithNoLiveNeighbours_SetsLiveNeighboursTo0()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeServices>>();
+            var configurationMock = new Mock<IConfiguration>();
+            var conwaysGameOfLifeServicesInstance = new ConwaysGameOfLifeServices(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+
+            var livePoints = new List<Point>
+            {
+                new Point(5, 5)
+            };
+            conwaysGameOfLifeServicesInstance.Seed(livePoints);
+
+            var boardPoint = new BoardPoint(5, 5);
+            var method = typeof(ConwaysGameOfLifeServices)
+                .GetMethod("CountNeighboursForPoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            // Act
+            int liveNeighbours = (int)method.Invoke(conwaysGameOfLifeServicesInstance, new object[] { boardPoint });
+
+            // Assert
+            Assert.That(liveNeighbours, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void CountNeighboursForPoint_LivePointWithEightLiveNeighbours_SetsLiveNeighboursTo8()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeServices>>();
+            var configurationMock = new Mock<IConfiguration>();
+            var conwaysGameOfLifeServicesInstance = new ConwaysGameOfLifeServices(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+
+            var center = new Point(0, 0);
+            var neighbours = new List<Point>
+            {
+                new Point(-1, -1), 
+                new Point(-1, 0), 
+                new Point(-1, 1),
+                new Point(0, -1),    
+                new Point(0, 1),
+                new Point(1, -1),  
+                new Point(1, 0), 
+                new Point(1, 1)
+            };
+            var livePoints = new List<Point>(neighbours) { center };
+            conwaysGameOfLifeServicesInstance.Seed(livePoints);
+
+            var boardPoint = new BoardPoint(0, 0);
+            var method = typeof(ConwaysGameOfLifeServices)
+                .GetMethod("CountNeighboursForPoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            // Act
+            int liveNeighbours = (int)method.Invoke(conwaysGameOfLifeServicesInstance, new object[] { boardPoint });
+
+            // Assert
+            Assert.That(liveNeighbours, Is.EqualTo(8));
+        }
+
+        [Test]
+        public void CountNeighbours_LivePointsWithKnownNeighbours_CorrectLiveNeighboursCount()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeServices>>();
+            var configurationMock = new Mock<IConfiguration>();
+            var conwaysGameOfLifeServicesInstance = new ConwaysGameOfLifeServices(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+
+            var livePoints = new List<Point>
+            {
+                new Point(0, 0),
+                new Point(0, 1),
+                new Point(1, 0),
+                new Point(1, 1),
+                new Point(-1, -1),
+                new Point(2, 2),
+            };
+            conwaysGameOfLifeServicesInstance.Seed(livePoints);
+
+            // Act
+            var method = typeof(ConwaysGameOfLifeServices).GetMethod("CountNeighbours", BindingFlags.NonPublic | BindingFlags.Instance);
+            method.Invoke(conwaysGameOfLifeServicesInstance, null);
+
+            // Assert
+            var livePointsField = typeof(ConwaysGameOfLifeServices).GetField("livePoints", BindingFlags.NonPublic | BindingFlags.Instance);
+            var livePointsSet = (HashSet<BoardPoint>)livePointsField.GetValue(conwaysGameOfLifeServicesInstance);
+
+            // Look for 20 total points (including dead neighbours).
+            Assert.That(livePointsSet, Has.Count.EqualTo(26), "There should be 26 points in total (6 points including 20 dead neighbours).");
+
+            // (1,1) should have 4 neighbours
+            var point = new BoardPoint(1, 1);
+            Assert.That(livePointsSet.TryGetValue(point, out var foundPoint), Is.True);
+            Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(4), point.ToString() + " should have 4 neighbours.");
+
+            // (0,0) should have 4 neighbours
+            point = new BoardPoint(0, 0);
+            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(4), point.ToString() + " should have 4 neighbours.");
+
+            // (0,1) should have 3 neighbours
+            point = new BoardPoint(0, 1);
+            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(3), point.ToString() + " should have 3 neighbours.");
+
+            // (2,2) should have 1 neighbours
+            point = new BoardPoint(2, 2);
+            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(1), point.ToString() + " should have 1 neighbours.");
+
+            // (-1,-1) should have 1 neighbours
+            point = new BoardPoint(-1, -1);
+            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(1), point.ToString() + " should have 1 neighbours.");
+
+            // (1,2) dead neighbour should have 3 neighbours
+            point = new BoardPoint(1, 2);
+            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(3), "Dead neighbour " + point.ToString() + " should have 3 neighbours.");
+
+            // (3,1) dead neighbour should have 1 neighbours
+            point = new BoardPoint(3, 1);
+            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(1), "Dead neighbour " + point.ToString() + " should have 1 neighbours.");
+
+            // (1,-1) dead neighbour should have 2 neighbours
+            point = new BoardPoint(1, -1);
+            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(2), "Dead neighbour " + point.ToString() + " should have 2 neighbours.");
         }
     }
 }

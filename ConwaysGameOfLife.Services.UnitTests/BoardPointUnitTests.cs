@@ -29,7 +29,7 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Assert
             Assert.That(point.X, Is.EqualTo(x));
             Assert.That(point.Y, Is.EqualTo(y));
-            Assert.That(point.Neighbours, Is.EqualTo(0));
+            Assert.That(point.LiveNeighbours, Is.EqualTo(0));
         }
 
         [Test]
