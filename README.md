@@ -52,7 +52,21 @@ The universe of the Game of Life is [an infinite, two-dimensional orthogonal gri
 
 The initial pattern constitutes the *seed* of the system. The first generation is created by applying the above rules simultaneously to every cell in the seed, live or dead; births and deaths occur simultaneously, and the discrete moment at which this happens is sometimes called a *tick*.[[nb 1\]](https://en.wikipedia.org/wiki/Conway's_Game_of_Life#cite_note-7) Each generation is a *[pure function](https://en.wikipedia.org/wiki/Pure_function)* of the preceding one. The rules continue to be applied repeatedly to create further generations. Ref:  https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life  
 
-***** **Incomplete**
+### ConwaysGameOfLifeServices
+
+Conway's Game of Life services layer provides the following functionality.
+
+#### Seed
+
+Seeding initializes the the pattern on the board which is saved in the database. The method is passed a list of live points. All other points are considered dead.
+
+#### Transition
+
+The transition increments through 1 or more generations by applying the above rules simultaneously to every cell on the board, live or dead; births and deaths occur simultaneously. The resulting generation is returned as a list of live points and saved in the database.
+
+#### End
+
+Ending the game increments through 1 or more generations until such time as it can return the final stable state of the board (i.e., when it no longer changes or cycles). If the board does not reach a stable conclusion within a reasonable number of iterations and error message is returned. Upon completion the game board is deleted from the database. 
 
 ## APIs
 
