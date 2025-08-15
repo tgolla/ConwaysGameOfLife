@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace ConwaysGameOfLife.Services
 {
     /// <summary>
-    /// Represents a point in a two-dimensional Cartesian coordinate system.
+    /// Represents a board point in a two-dimensional Cartesian coordinate system.
     /// </summary>
     /// <remarks>The <see cref="BoardPoint"/> structure is immutable and provides methods for comparing points and
     /// obtaining their string representation. Instances of <see cref="BoardPoint"/> are defined by their <see cref="X"/> and
     /// <see cref="Y"/> coordinates.</remarks>
-    public class BoardPoint : IEquatable<BoardPoint>
+    public struct BoardPoint : IEquatable<BoardPoint>
     {
         public int X { get; }
         public int Y { get; }
