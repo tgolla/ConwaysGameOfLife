@@ -58,7 +58,7 @@ Conway's Game of Life services layer provides the following functionality.
 
 #### Seed
 
-Seeding initializes the the pattern on the board which is saved in the database. The method is passed a list of live points. All other points are considered dead.
+Seeding initializes the the pattern on the board which is saved in the database. The method is passed a list of live points and returns the game board id. All other points are considered dead.
 
 #### Transition
 
