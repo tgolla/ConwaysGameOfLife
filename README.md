@@ -1,7 +1,6 @@
 # NetDocuments Coding Exercise: Conway's Game Of Life API
 
 
-
 [TOC]
 
 ## Objective
@@ -32,7 +31,7 @@ This table maintains a record for each active board.
 
 ### LivePoints Table
 
-This table maintains the current state of the board represented in live points on the grid. Points not recorded in this table are considered dead.
+This table maintains the current state of the board represented in live points on the grid (board). Points not recorded in this table are considered dead.
 
 | Field | Type | Description                         |
 | ----- | ---- | ----------------------------------- |
@@ -50,4 +49,28 @@ TBD
 
 ## Project Setup
 
-TBD
+To run this project locally you will need to install SQL Server Express and create the `ConwaysGameOfLifeApiDb` database using the following Entity Framework Core command. Ref: `ConwaysGameOfLifeApiDbContext.cs`
+
+```
+update-database -context ConwaysGameOfLifeApiDbContext
+```
+
+This command should be run is Visual Studio using the Package Manager Console with the Default project set to `ConwaysGameOfLife.Data`. Before executing you will need to add the DB connection string to the `ConwaysGameOfLife` project User Secrets.
+
+```json
+  "ConnectionStrings": {
+    "ConwaysGameOfLifeApiDb": "Data Source=localhost\\sqlexpress;Database=ConwaysGameOfLifeApiDb;Integrated Security=false;Encrypt=false;User ID=xxxxxxxx;Password=xxxxxxxx;"
+  }
+```
+
+To do this in Visual Studio right click the `ConwaysGameOfLife` project in Solutions Explorer view and select Manage User Secrets. Paste in the connection string JSON replacing the User Id and Password with a SQL Server Express user.
+
+***** **Incomplete**
+
+## History
+
+| Date      | Author        | Modification           |
+| --------- | ------------- | ---------------------- |
+| 8/14/2025 | Terence Golla | Initial Draft Document |
+|           |               |                        |
+
