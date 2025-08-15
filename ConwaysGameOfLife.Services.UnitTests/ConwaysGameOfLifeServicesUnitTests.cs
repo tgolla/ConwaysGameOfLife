@@ -1,15 +1,9 @@
 using ConwaysGameOfLife.Data;
-using ConwaysGameOfLife.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.InMemory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Reflection;
 
 namespace ConwaysGameOfLife.Services.UnitTests
@@ -95,7 +89,10 @@ namespace ConwaysGameOfLife.Services.UnitTests
                 .GetMethod("CountNeighboursForPoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
             // Act
-            int liveNeighbours = (int)method.Invoke(conwaysGameOfLifeServicesInstance, new object[] { boardPoint });
+            Assert.IsNotNull(method, "CountNeighboursForPoint method should not be null.");
+            var result = method.Invoke(conwaysGameOfLifeServicesInstance, new object[] { boardPoint });
+            Assert.IsNotNull(result, "CountNeighboursForPoint should not return null.");
+            int liveNeighbours = (int)result;
 
             // Assert
             Assert.That(liveNeighbours, Is.EqualTo(2));
@@ -121,7 +118,10 @@ namespace ConwaysGameOfLife.Services.UnitTests
                 .GetMethod("CountNeighboursForPoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
             // Act
-            int liveNeighbours = (int)method.Invoke(conwaysGameOfLifeServicesInstance, new object[] { boardPoint });
+            Assert.IsNotNull(method, "CountNeighboursForPoint method should not be null.");
+            var result = method.Invoke(conwaysGameOfLifeServicesInstance, new object[] { boardPoint });
+            Assert.IsNotNull(result, "CountNeighboursForPoint should not return null.");
+            int liveNeighbours = (int)result;
 
             // Assert
             Assert.That(liveNeighbours, Is.EqualTo(0));
@@ -156,7 +156,10 @@ namespace ConwaysGameOfLife.Services.UnitTests
                 .GetMethod("CountNeighboursForPoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
             // Act
-            int liveNeighbours = (int)method.Invoke(conwaysGameOfLifeServicesInstance, new object[] { boardPoint });
+            Assert.IsNotNull(method, "CountNeighboursForPoint method should not be null.");
+            var result = method.Invoke(conwaysGameOfLifeServicesInstance, new object[] { boardPoint });
+            Assert.IsNotNull(result, "CountNeighboursForPoint should not return null.");
+            int liveNeighbours = (int)result;
 
             // Assert
             Assert.That(liveNeighbours, Is.EqualTo(8));
@@ -184,14 +187,13 @@ namespace ConwaysGameOfLife.Services.UnitTests
 
             // Act
             var method = typeof(ConwaysGameOfLifeServices).GetMethod("CountNeighbours", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.IsNotNull(method, "CountNeighbours method should not be null.");
             method.Invoke(conwaysGameOfLifeServicesInstance, null);
 
             // Assert
             var livePointsField = typeof(ConwaysGameOfLifeServices).GetField("livePoints", BindingFlags.NonPublic | BindingFlags.Instance);
-            var livePointsSet = (HashSet<BoardPoint>)livePointsField.GetValue(conwaysGameOfLifeServicesInstance);
-
-            // Look for 20 total points (including dead neighbours).
-            Assert.That(livePointsSet, Has.Count.EqualTo(26), "There should be 26 points in total (6 points including 20 dead neighbours).");
+            var livePointsSet = (HashSet<BoardPoint>?)livePointsField?.GetValue(conwaysGameOfLifeServicesInstance)
+                ?? throw new InvalidOperationException("livePoints field is null.");
 
             // (1,1) should have 4 neighbours
             var point = new BoardPoint(1, 1);
@@ -208,6 +210,11 @@ namespace ConwaysGameOfLife.Services.UnitTests
             Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
             Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(3), point.ToString() + " should have 3 neighbours.");
 
+            // (1,0) should have 3 neighbours
+            point = new BoardPoint(1, 0);
+            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(3), point.ToString() + " should have 3 neighbours.");
+
             // (2,2) should have 1 neighbours
             point = new BoardPoint(2, 2);
             Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
@@ -218,19 +225,24 @@ namespace ConwaysGameOfLife.Services.UnitTests
             Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
             Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(1), point.ToString() + " should have 1 neighbours.");
 
+
+            var deadNeighborField = typeof(ConwaysGameOfLifeServices).GetField("deadNeighbours", BindingFlags.NonPublic | BindingFlags.Instance);
+            var deadNeighboursSet = (HashSet<BoardPoint>?)deadNeighborField?.GetValue(conwaysGameOfLifeServicesInstance)
+                ?? throw new InvalidOperationException("deadNeighbours field is null.");
+
             // (1,2) dead neighbour should have 3 neighbours
             point = new BoardPoint(1, 2);
-            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(deadNeighboursSet.TryGetValue(point, out foundPoint), Is.True);
             Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(3), "Dead neighbour " + point.ToString() + " should have 3 neighbours.");
 
             // (3,1) dead neighbour should have 1 neighbours
             point = new BoardPoint(3, 1);
-            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(deadNeighboursSet.TryGetValue(point, out foundPoint), Is.True);
             Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(1), "Dead neighbour " + point.ToString() + " should have 1 neighbours.");
 
             // (1,-1) dead neighbour should have 2 neighbours
             point = new BoardPoint(1, -1);
-            Assert.That(livePointsSet.TryGetValue(point, out foundPoint), Is.True);
+            Assert.That(deadNeighboursSet.TryGetValue(point, out foundPoint), Is.True);
             Assert.That(foundPoint.LiveNeighbours, Is.EqualTo(2), "Dead neighbour " + point.ToString() + " should have 2 neighbours.");
         }
     }

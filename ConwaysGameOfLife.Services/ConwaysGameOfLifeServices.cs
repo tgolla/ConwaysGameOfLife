@@ -127,22 +127,83 @@ namespace ConwaysGameOfLife.Services
                 updatedLivePoints.Add(updatedLivePoint);
             }
 
+            // Update the livePoints set with the newly counted live points.
+            livePoints = updatedLivePoints;
+
             // Process dead neighbours to count their live neighbours.
+            var updatedDeadNeighbours = new HashSet<BoardPoint>();
+
             foreach (var deadNeighbor in deadNeighbours.ToList())
             {
-                var updatedLivePoint = deadNeighbor;
-                updatedLivePoint.LiveNeighbours = CountNeighboursForPoint(deadNeighbor);
-                updatedLivePoints.Add(updatedLivePoint);
+                var updatedDeadNeighbour = deadNeighbor;
+                updatedDeadNeighbour.LiveNeighbours = CountNeighboursForPoint(deadNeighbor);
+                updatedDeadNeighbours.Add(updatedDeadNeighbour);
             }
 
-            livePoints = updatedLivePoints;
+            // Update the deadNeighbours set with the newly counted dead neighbours.
+            deadNeighbours = updatedDeadNeighbours;
         }
-
-        public List<Point> Transition(Guid boardId)
+        
+        private void TransitionOnce()
         {
             CountNeighbours();
 
-            throw new NotImplementedException("Transition logic is not implemented yet. This method should apply the rules of Conway's Game of Life to update the state of livePoints based on their neighbours.");
+            // Clean out livePoints based on the rules of Conway's Game of Life.
+
+            // 1. Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+            livePoints.RemoveWhere(p => p.LiveNeighbours < 2);
+
+            // 2. Any live cell with two or three live neighbours lives on to the next generation.
+            // 3. Any live cell with more than three live neighbours dies, as if by overpopulation.
+            livePoints.RemoveWhere(p => p.LiveNeighbours > 3);
+
+            // 4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+            foreach (var deadNeighbor in deadNeighbours)
+            {
+                if (deadNeighbor.LiveNeighbours == 3)
+                {
+                    livePoints.Add(deadNeighbor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Simulates the evolution of the game board for a specified number of iterations and updates the database with the resulting state.
+        /// </summary>
+        /// <remarks>
+        /// If there are no live points remaining during the simulation, the process will terminate early.
+        /// The database is updated to reflect the final state of live points for the specified board.
+        /// </remarks>
+        /// <param name="boardId">The unique identifier of the game board to update.</param>
+        /// <param name="iterations">The number of iterations to simulate. Must be a non-negative integer.</param>
+        /// <returns>A list of <see cref="Point"/> objects representing the coordinates of all live points after the simulation.</returns>
+        public List<Point> Transition(Guid boardId, uint iterations)
+        {
+            for (uint i = 0; i < iterations; i++)
+            {
+                // If there are no live points left, we can stop the simulation early.
+                if (livePoints.Count == 0)
+                    break;
+
+                TransitionOnce();
+            }
+
+            // Update the database with the new state of live points.
+            var livePointEntities = livePoints.Select(p => new LivePoint
+            {
+                BoardId = boardId, // Use the provided boardId
+                X = p.X,
+                Y = p.Y
+            }).ToList();
+
+            // Remove existing live points for the specified boardId before adding new ones.
+            conwaysGameOfLifeApiDbContext.LivePoints.RemoveRange(conwaysGameOfLifeApiDbContext.LivePoints.Where(x => x.BoardId == boardId));
+
+            conwaysGameOfLifeApiDbContext.LivePoints.AddRange(livePointEntities);
+
+            conwaysGameOfLifeApiDbContext.SaveChanges();
+
+            return livePoints.Select(p => new Point(p.X, p.Y)).ToList();
         }
     }
 }
