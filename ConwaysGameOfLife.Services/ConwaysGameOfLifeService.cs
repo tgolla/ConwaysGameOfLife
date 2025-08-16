@@ -184,6 +184,11 @@ namespace ConwaysGameOfLife.Services
         /// <returns>A list of <see cref="Point"/> objects representing the coordinates of all live points after the simulation.</returns>
         public List<Point> Transition(Guid boardId, uint iterations)
         {
+            // Check if the board exists before proceeding.
+            var boardExists = conwaysGameOfLifeApiDbContext.Boards.Any(b => b.Id == boardId);
+            if (!boardExists)
+                throw new InvalidOperationException($"Board with id {boardId} does not exist.");
+
             // Get the current live points for the specified boardId.       
             livePoints = conwaysGameOfLifeApiDbContext.LivePoints
                 .Where(lp => lp.BoardId == boardId)
@@ -236,6 +241,11 @@ namespace ConwaysGameOfLife.Services
         /// <exception cref="InvalidOperationException">Thrown if the maximum generation limit is reached before the simulation stabilizes or cycles.</exception>
         public List<Point> End(Guid boardId)
         {
+            // Check if the board exists before proceeding.
+            var boardExists = conwaysGameOfLifeApiDbContext.Boards.Any(b => b.Id == boardId);
+            if (!boardExists)
+                throw new InvalidOperationException($"Board with id {boardId} does not exist.");
+
             // Get the current live points for the specified boardId.       
             livePoints = conwaysGameOfLifeApiDbContext.LivePoints
                 .Where(lp => lp.BoardId == boardId)
