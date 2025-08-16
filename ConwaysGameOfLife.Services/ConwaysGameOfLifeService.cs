@@ -1,6 +1,7 @@
 ﻿using ConwaysGameOfLife.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
 using System.Drawing;
 
 namespace ConwaysGameOfLife.Services
@@ -172,14 +173,14 @@ namespace ConwaysGameOfLife.Services
         }
 
         /// <summary>
-        /// Simulates the evolution of the game board for a specified number of iterations and updates the database with the resulting state.
+        /// Simulates the evolution of the game board for a specified number of periods and updates the database with the resulting state.
         /// </summary>
         /// <remarks>
         /// If there are no live points remaining during the simulation, the process will terminate early.
         /// The database is updated to reflect the final state of live points for the specified board.
         /// </remarks>
         /// <param name="boardId">The unique identifier of the game board to update.</param>
-        /// <param name="iterations">The number of iterations to simulate. Must be a non-negative integer.</param>
+        /// <param name="iterations">The number of periods to simulate. Must be a non-negative integer.</param>
         /// <returns>A list of <see cref="Point"/> objects representing the coordinates of all live points after the simulation.</returns>
         public List<Point> Transition(Guid boardId, uint iterations)
         {
@@ -216,7 +217,23 @@ namespace ConwaysGameOfLife.Services
             return livePoints.Select(p => new Point(p.X, p.Y)).ToList();
         }
 
-
+        /// <summary>
+        /// Ends the simulation for the specified board and returns the final set of live points.
+        /// </summary>
+        /// <remarks>
+        /// This method simulates the evolution of the board until one of the following
+        /// conditions is met: 
+        /// <list type="bullet"> 
+        /// <item><description>The population stabilizes or cycles for a predefined number of iterations.</description></item>
+        /// <item><description>All live points are eliminated.</description></item>
+        /// <item><description>The maximum generation limit is reached.</description></item>
+        /// </list> 
+        /// If the maximum generation limit is reached without stabilization or cycling, an exception is thrown.
+        /// The method also removes the board and its associated live points from the database.
+        /// </remarks>
+        /// <param name="boardId">The unique identifier of the board to end the simulation for.</param>
+        /// <returns>A list of <see cref="Point"/> objects representing the final set of live points on the board. If no live points remain, the list will be empty.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the maximum generation limit is reached before the simulation stabilizes or cycles.</exception>
         public List<Point> End(Guid boardId)
         {
             // Get the current live points for the specified boardId.       
@@ -226,35 +243,49 @@ namespace ConwaysGameOfLife.Services
                 .ToHashSet();
 
             bool maximunGenerationReached = true; // Determines if an error should be throw.
-            uint stablePopulationIterations = 0;
+            Dictionary<int, uint> previousPopulation = new();
+            Dictionary<int, uint> stablePopulationIterations = new();
 
             for (uint i = 0; i < conwaysGameOfLifeSettings.MaximunGenerationBeforeEnding; i++)
             {
                 // If there are no live points left, we can stop the simulation early.
                 if (livePoints.Count == 0)
+                {
+                    maximunGenerationReached = false; // Simulation ended without reaching the maximum generation.
                     break;
-
-                uint previousLiveCount = (uint)livePoints.Count;
+                }
 
                 TransitionOnce();
+                                
+                // Test for a stable population over a set number of periods.
+                var periods = new[] { 1, 2, 3, 4, 8, 14, 15, 30 };
+                bool shouldBreakOutOfIterations = false;
 
-                // Additional test to determine if the population is stable or cycling.
-
-                // Test for a stable population over a set number of iterations.
-                if (livePoints.Count == previousLiveCount)
+                foreach (var period in periods)
                 {
-                    stablePopulationIterations++;
-                    if (stablePopulationIterations >= conwaysGameOfLifeSettings.StablePopulationIterations)
+                    if (i % period == 0)
                     {
-                        // Population is stable, we can end the simulation.
-                        maximunGenerationReached = false;
-                        break;
+                        if (previousPopulation.TryGetValue(period, out var previousPopulationCount) && livePoints.Count == previousPopulationCount)
+                        {
+                            stablePopulationIterations[period]++;
+                            if (stablePopulationIterations[period] >= conwaysGameOfLifeSettings.StablePopulationIterations)
+                            {
+                                // Population is stable, we can end the simulation.
+                                maximunGenerationReached = false;
+                                shouldBreakOutOfIterations = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            previousPopulation[period] = (uint)livePoints.Count;
+                            stablePopulationIterations[period] = 0; // Reset if the population changed.
+                        }
                     }
                 }
-                else
-                    stablePopulationIterations = 0; // Reset if the population changed.
 
-                //TODO: Implement logic to detect oscillators if needed.
+                if (shouldBreakOutOfIterations)
+                    break;
             }
 
             // Clear the live points from the database for the specified boardId.

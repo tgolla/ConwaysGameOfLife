@@ -151,13 +151,13 @@ namespace ConwaysGameOfLife.Services.UnitTests
             var center = new Point(0, 0);
             var neighbours = new List<Point>
             {
-                new Point(-1, -1), 
-                new Point(-1, 0), 
+                new Point(-1, -1),
+                new Point(-1, 0),
                 new Point(-1, 1),
-                new Point(0, -1),    
+                new Point(0, -1),
                 new Point(0, 1),
-                new Point(1, -1),  
-                new Point(1, 0), 
+                new Point(1, -1),
+                new Point(1, 0),
                 new Point(1, 1)
             };
             var livePoints = new List<Point>(neighbours) { center };
@@ -560,7 +560,7 @@ namespace ConwaysGameOfLife.Services.UnitTests
             var configuration = CreateConfiguration();
             var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
-            // Toad pattern (Oscillator)
+            // Beacon pattern (Oscillator)
             var initialLivePoints = new List<Point>
             {
                 new Point(2, 0),
@@ -613,5 +613,164 @@ namespace ConwaysGameOfLife.Services.UnitTests
         }
 
         //TODO: Add more tests for other patterns like Pulsar, Pentadecathlon, Glider, Lightweight Spaceship (LWSS), Rpentomino, Diehard, Acorn, etc.
+
+
+        [Test]
+        public void End_EmptyBoard_ReturnsEmptyList()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
+            var boardId = Guid.NewGuid();
+
+            conwaysGameOfLifeDbContext.Boards.Add(new Board { Id = boardId, Expires = DateTime.UtcNow });
+            conwaysGameOfLifeDbContext.SaveChanges();
+
+            // Act
+            var result = ConwaysGameOfLifeServiceInstance.End(boardId);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result);
+            Assert.IsNull(conwaysGameOfLifeDbContext.Boards.Find(boardId));
+        }
+
+        [Test]
+        public void End_SingleLiveCell_Dies_ReturnsEmptyList()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
+            var boardId = Guid.NewGuid();
+
+            conwaysGameOfLifeDbContext.Boards.Add(new Board { Id = boardId, Expires = DateTime.UtcNow });
+            conwaysGameOfLifeDbContext.LivePoints.Add(new LivePoint { BoardId = boardId, X = 0, Y = 0 });
+            conwaysGameOfLifeDbContext.SaveChanges();
+
+            // Act
+            var result = ConwaysGameOfLifeServiceInstance.End(boardId);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result);
+            Assert.IsNull(conwaysGameOfLifeDbContext.Boards.Find(boardId));
+        }
+
+        [Test]
+        public void End_StableBlockPattern_EndsEarlyWithBlock()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
+            var boardId = Guid.NewGuid();
+
+            conwaysGameOfLifeDbContext.Boards.Add(new Board { Id = boardId, Expires = DateTime.UtcNow });
+
+            // Block pattern
+            conwaysGameOfLifeDbContext.LivePoints.AddRange(new[] {
+                            new LivePoint { BoardId = boardId, X = 0, Y = 0 },
+                            new LivePoint { BoardId = boardId, X = 0, Y = 1 },
+                            new LivePoint { BoardId = boardId, X = 1, Y = 0 },
+                            new LivePoint { BoardId = boardId, X = 1, Y = 1 }
+                        });
+            conwaysGameOfLifeDbContext.SaveChanges();
+
+            // Act
+            var result = ConwaysGameOfLifeServiceInstance.End(boardId);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.That(result.Count, Is.EqualTo(4));
+            var expected = new HashSet<Point> { new(0, 0), new(0, 1), new(1, 0), new(1, 1) };
+            CollectionAssert.AreEquivalent(expected, result);
+            Assert.IsNull(conwaysGameOfLifeDbContext.Boards.Find(boardId));
+        }
+
+        [Test]
+        public void End_OscillatorBeaconPattern_EndsEarlyWithBlock()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
+            var boardId = Guid.NewGuid();
+
+            conwaysGameOfLifeDbContext.Boards.Add(new Board { Id = boardId, Expires = DateTime.UtcNow });
+
+            // Beacon pattern
+            conwaysGameOfLifeDbContext.LivePoints.AddRange(new[] {
+                            new LivePoint { BoardId = boardId, X = 2, Y = 0 },
+                            new LivePoint { BoardId = boardId, X = 3, Y = 0 },
+                            new LivePoint { BoardId = boardId, X = 2, Y = 1 },
+                            new LivePoint { BoardId = boardId, X = 3, Y = 1 },
+                            new LivePoint { BoardId = boardId, X = 0, Y = 2 },
+                            new LivePoint { BoardId = boardId, X = 1, Y = 2 },
+                            new LivePoint { BoardId = boardId, X = 0, Y = 3 },
+                            new LivePoint { BoardId = boardId, X = 1, Y = 3 }
+                        });
+
+            conwaysGameOfLifeDbContext.SaveChanges();
+
+            // Act
+            var result = ConwaysGameOfLifeServiceInstance.End(boardId);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.That(result.Count, Is.EqualTo(6));
+            var expected = new HashSet<Point> { new(2, 0), new(3, 0), new(3, 1), new(0, 2), new(0, 3), new(1, 3) };
+            CollectionAssert.AreEquivalent(expected, result);
+            Assert.IsNull(conwaysGameOfLifeDbContext.Boards.Find(boardId));
+        }
+
+        //TODO: Add test for Pulsar, R-pentomino, Diehard, and Acorn.
+
+        [Test]
+        public void End_MaxGenerationReached_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
+            var boardId = Guid.NewGuid();
+
+            conwaysGameOfLifeDbContext.Boards.Add(new Board { Id = boardId, Expires = DateTime.UtcNow });
+
+            // Blinker pattern (period 2 oscillator)
+            conwaysGameOfLifeDbContext.LivePoints.AddRange(new[] {
+                            new LivePoint { BoardId = boardId, X = 0, Y = 1 },
+                            new LivePoint { BoardId = boardId, X = 1, Y = 1 },
+                            new LivePoint { BoardId = boardId, X = 2, Y = 1 }
+                        });
+            conwaysGameOfLifeDbContext.SaveChanges();
+
+            // Set settings to require a very high number of stable iterations to force max generation
+            // Replace this block:
+            var inMemorySettings = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("ConwaysGameOfLifeSettings:MaximunGenerationBeforeEnding", "3"),
+                new KeyValuePair<string, string>("ConwaysGameOfLifeSettings:StablePopulationIterations", "100")
+            };
+
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+            configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+            loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
+            var customService = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
+
+            // Act & Assert
+            var ex = Assert.Throws<InvalidOperationException>(() => customService.End(boardId));
+            StringAssert.Contains("maximum generation limit", ex.Message);
+            Assert.IsNull(conwaysGameOfLifeDbContext.Boards.Find(boardId));
+        }
     }
 }
