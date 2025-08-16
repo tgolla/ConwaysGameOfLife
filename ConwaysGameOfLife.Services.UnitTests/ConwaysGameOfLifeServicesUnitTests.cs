@@ -357,6 +357,42 @@ namespace ConwaysGameOfLife.Services.UnitTests
         }
 
         [Test]
+        public void Transition_SeedWithBoatPattern_TransitionsCorrectly()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeServices>>();
+            var configurationMock = new Mock<IConfiguration>();
+            var conwaysGameOfLifeServicesInstance = new ConwaysGameOfLifeServices(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+
+            // Boat pattern (Still Life)
+            var initialLivePoints = new List<Point>
+            {
+                new Point(1, 0),
+                new Point(0, 1),
+                new Point(2, 1),
+                new Point(0, 2),
+                new Point(1, 2)
+            };
+            var boardId = conwaysGameOfLifeServicesInstance.Seed(initialLivePoints);
+
+            // Act
+            var result = conwaysGameOfLifeServicesInstance.Transition(boardId, 1);
+
+            // Assert
+            // After one iteration a still life should be identical.
+            var expected = initialLivePoints;
+
+            Assert.That(result.Count, Is.EqualTo(5));
+            CollectionAssert.AreEquivalent(expected, result);
+
+            // Also check that the database reflects the new state.
+            var dbLivePoints = conwaysGameOfLifeDbContext.LivePoints.Where(lp => lp.BoardId == boardId)
+                .Select(lp => new Point(lp.X, lp.Y)).ToList();
+            CollectionAssert.AreEquivalent(expected, dbLivePoints);
+        }
+
+        [Test]
         public void Transition_SeedWithBlinkerPattern_TransitionsCorrectly()
         {
             // Arrange
