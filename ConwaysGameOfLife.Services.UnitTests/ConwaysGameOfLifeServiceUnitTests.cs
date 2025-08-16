@@ -34,14 +34,26 @@ namespace ConwaysGameOfLife.Services.UnitTests
             return new ConwaysGameOfLifeApiDbContext(options);
         }
 
+        /// <summary>
+        /// Creates and configures an <see cref="IConfiguration"/> instance using appsettings.json.
+        /// </summary>
+        /// <returns>An <see cref="IConfiguration"/> instance containing the configuration settings.</returns>
+        private IConfiguration CreateConfiguration()
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            return builder.Build();
+        }
+
         [Test]
         public void Seed_WithValidLivePoints_CreatesBoardAndLivePoints()
         {
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             var livePoints = new List<Point>
             {
@@ -72,8 +84,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             var livePoints = new List<Point>
             {
@@ -104,8 +116,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             var livePoints = new List<Point>
             {
@@ -133,8 +145,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             var center = new Point(0, 0);
             var neighbours = new List<Point>
@@ -171,8 +183,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             var livePoints = new List<Point>
             {
@@ -252,8 +264,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             // Block pattern (Still Life)
             var initialLivePoints = new List<Point>
@@ -287,8 +299,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             // Beehive pattern (Still Life)
             var initialLivePoints = new List<Point>
@@ -324,8 +336,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             // Loaf pattern (Still Life)
             var initialLivePoints = new List<Point>
@@ -362,8 +374,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             // Boat pattern (Still Life)
             var initialLivePoints = new List<Point>
@@ -398,8 +410,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             // BTub pattern (Still Life)
             var initialLivePoints = new List<Point>
@@ -433,8 +445,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             // Blinker pattern (Oscillator): three vertical cells at (1,0), (1,1), (1,2)
             var initialLivePoints = new List<Point>
@@ -487,8 +499,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             // Toad pattern (Oscillator)
             var initialLivePoints = new List<Point>
@@ -545,8 +557,8 @@ namespace ConwaysGameOfLife.Services.UnitTests
             // Arrange
             var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
             var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
-            var configurationMock = new Mock<IConfiguration>();
-            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
 
             // Toad pattern (Oscillator)
             var initialLivePoints = new List<Point>

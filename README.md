@@ -1,4 +1,4 @@
-# NetDocuments Coding Exercise: Conway's Game Of Life API
+# Coding Exercise: Conway's Game Of Life API
 
 
 [TOC]
@@ -66,7 +66,7 @@ The transition increments through 1 or more generations by applying the above ru
 
 #### End
 
-Ending the game increments through 1 or more generations until such time as it can return the final stable state of the board (i.e., when it no longer changes or cycles). If the board does not reach a stable conclusion within a reasonable number of iterations and error message is returned. Upon completion the game board is deleted from the database. 
+Ending the game increments through 1 or more generations until such time as it can return the final stable state of the board (i.e., when it no longer changes or cycles). If the board does not reach a stable conclusion within a reasonable number of iterations an error is returned. In either case the last iteration of live points is returned. Upon completion the game board is deleted from the database. 
 
 ## APIs
 
@@ -91,6 +91,16 @@ This command should be run is Visual Studio using the Package Manager Console wi
 To do this in Visual Studio right click the `ConwaysGameOfLife` project in Solutions Explorer view and select Manage User Secrets. Paste in the connection string JSON replacing the User Id and Password with a SQL Server Express user.
 
 ***** **Incomplete**
+
+## Future Enhancements
+
+The follow future enhancements for the project have been noted.
+
+- Add function testing for the APIs with Playwright.
+- Add more pattern unit tests.
+- Review with team possible end game logic.
+- Build graphic frontend.
+
 
 ## History
 

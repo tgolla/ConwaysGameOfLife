@@ -15,6 +15,7 @@ namespace ConwaysGameOfLife.Services
     /// </remarks>
     public class ConwaysGameOfLifeService
     {
+        private readonly ConwaysGameOfLifeSettings conwaysGameOfLifeSettings;
         private readonly ConwaysGameOfLifeApiDbContext conwaysGameOfLifeApiDbContext;
 
         private HashSet<BoardPoint> livePoints;
@@ -23,12 +24,14 @@ namespace ConwaysGameOfLife.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="ConwaysGameOfLifeService"/> class.
         /// </summary>
-        /// <remarks>
-        /// This constructor sets up the necessary services for managing and simulating Conway's Game of Life.
-        /// </remarks>
+        /// <param name="logger">The logger used to log diagnostic and operational messages.</param>
+        /// <param name="configuration">The configuration object used to retrieve application settings.</param>
+        /// <param name="conwaysGameOfLifeApiDbContext">The database context for accessing Conway's Game of Life data.</param>
         public ConwaysGameOfLifeService(ILogger<ConwaysGameOfLifeService> logger, IConfiguration configuration, ConwaysGameOfLifeApiDbContext conwaysGameOfLifeApiDbContext)
         {
-            this.conwaysGameOfLifeApiDbContext = conwaysGameOfLifeApiDbContext; // Fix: assign parameter to field
+            conwaysGameOfLifeSettings = configuration.GetSection("ConwaysGameOfLifeSettings").Get<ConwaysGameOfLifeSettings>();
+
+            this.conwaysGameOfLifeApiDbContext = conwaysGameOfLifeApiDbContext;
             livePoints = new HashSet<BoardPoint>();
         }
 
