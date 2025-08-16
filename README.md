@@ -91,6 +91,7 @@ This command should be run is Visual Studio using the Package Manager Console wi
 To do this in Visual Studio right click the `ConwaysGameOfLife` project in Solutions Explorer view and select Manage User Secrets. Paste in the connection string JSON replacing the User Id and Password with a SQL Server Express user.
 
 ***** **Incomplete**
+Add note about logs folder.
 
 ## Future Enhancements
 
