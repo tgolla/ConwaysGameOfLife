@@ -29,7 +29,8 @@ namespace ConwaysGameOfLife.Services
         /// <param name="conwaysGameOfLifeApiDbContext">The database context for accessing Conway's Game of Life data.</param>
         public ConwaysGameOfLifeService(ILogger<ConwaysGameOfLifeService> logger, IConfiguration configuration, ConwaysGameOfLifeApiDbContext conwaysGameOfLifeApiDbContext)
         {
-            conwaysGameOfLifeSettings = configuration.GetSection("ConwaysGameOfLifeSettings").Get<ConwaysGameOfLifeSettings>();
+            conwaysGameOfLifeSettings = configuration.GetSection("ConwaysGameOfLifeSettings").Get<ConwaysGameOfLifeSettings>()
+                ?? throw new InvalidOperationException("ConwaysGameOfLifeSettings section is missing or invalid in configuration.");
 
             this.conwaysGameOfLifeApiDbContext = conwaysGameOfLifeApiDbContext;
             livePoints = new HashSet<BoardPoint>();
