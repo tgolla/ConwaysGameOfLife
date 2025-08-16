@@ -225,17 +225,36 @@ namespace ConwaysGameOfLife.Services
                 .Select(lp => new BoardPoint(lp.X, lp.Y))
                 .ToHashSet();
 
-            uint iterations = 1000; // TODO: Make this configurable.
+            bool maximunGenerationReached = true; // Determines if an error should be throw.
+            uint stablePopulationIterations = 0;
 
-            for (uint i = 0; i < iterations; i++)
+            for (uint i = 0; i < conwaysGameOfLifeSettings.MaximunGenerationBeforeEnding; i++)
             {
                 // If there are no live points left, we can stop the simulation early.
                 if (livePoints.Count == 0)
                     break;
 
+                uint previousLiveCount = (uint)livePoints.Count;
+
                 TransitionOnce();
 
-                //TODO: Compare count(population) for change over configured iteration.
+                // Additional test to determine if the population is stable or cycling.
+
+                // Test for a stable population over a set number of iterations.
+                if (livePoints.Count == previousLiveCount)
+                {
+                    stablePopulationIterations++;
+                    if (stablePopulationIterations >= conwaysGameOfLifeSettings.StablePopulationIterations)
+                    {
+                        // Population is stable, we can end the simulation.
+                        maximunGenerationReached = false;
+                        break;
+                    }
+                }
+                else
+                    stablePopulationIterations = 0; // Reset if the population changed.
+
+                //TODO: Implement logic to detect oscillators if needed.
             }
 
             // Clear the live points from the database for the specified boardId.
@@ -251,6 +270,9 @@ namespace ConwaysGameOfLife.Services
                 conwaysGameOfLifeApiDbContext.Boards.Remove(board);
                 conwaysGameOfLifeApiDbContext.SaveChanges();
             }
+
+            if (maximunGenerationReached)
+                throw new InvalidOperationException($"The maximum generation limit of {conwaysGameOfLifeSettings.MaximunGenerationBeforeEnding} was reached before the game could stabilize or cycle.");
 
             return livePoints.Select(p => new Point(p.X, p.Y)).ToList();
         }
