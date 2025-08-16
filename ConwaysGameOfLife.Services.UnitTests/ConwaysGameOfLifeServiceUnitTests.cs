@@ -763,7 +763,7 @@ namespace ConwaysGameOfLife.Services.UnitTests
             Assert.IsNull(conwaysGameOfLifeDbContext.Boards.Find(boardId));
         }
 
-        //TODO: Add test for Pulsar, Diehard, and Acorn.
+        //TODO: Add test for Pulsar, Diehard, Acorn and infinte growth (single block-laying switch engine).
 
         [Test]
         public void End_MaxGenerationReached_ThrowsInvalidOperationException()
