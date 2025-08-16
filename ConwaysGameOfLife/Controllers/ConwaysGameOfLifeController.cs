@@ -82,7 +82,15 @@ namespace ConwaysGameOfLife.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Ends the game session for the specified board and retrieves the final state of the game.
+        /// </summary>
+        /// <remarks>
+        /// This method uses the Conway's Game of Life service to end the game session associated with the specified board.
+        /// </remarks>
+        /// <param name="boardId">The unique identifier of the board whose game session is to be ended.</param>
+        /// <returns>An <see cref="IActionResult"/> containing the final state of the game as a collection of points  if the
+        /// operation is successful, or an error response if the operation fails.</returns>
         [HttpDelete]
         public IActionResult Delete([FromQuery] Guid boardId)
         {
