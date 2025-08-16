@@ -318,6 +318,21 @@ namespace ConwaysGameOfLife.Services.UnitTests
             var dbLivePoints = conwaysGameOfLifeDbContext.LivePoints.Where(lp => lp.BoardId == boardId)
                 .Select(lp => new Point(lp.X, lp.Y)).ToList();
             CollectionAssert.AreEquivalent(expected, dbLivePoints);
+
+            // Act
+            result = conwaysGameOfLifeServicesInstance.Transition(boardId, 1);
+
+            // Assert
+            // After two iterations, blinker should return back to orginal vertical pattern: (1,0), (1,1), (1,2)
+            expected = initialLivePoints;
+
+            Assert.That(result.Count, Is.EqualTo(3));
+            CollectionAssert.AreEquivalent(expected, result);
+
+            // Also check that the database reflects the new state.
+            dbLivePoints = conwaysGameOfLifeDbContext.LivePoints.Where(lp => lp.BoardId == boardId)
+                .Select(lp => new Point(lp.X, lp.Y)).ToList();
+            CollectionAssert.AreEquivalent(expected, dbLivePoints);
         }
     }
 }
