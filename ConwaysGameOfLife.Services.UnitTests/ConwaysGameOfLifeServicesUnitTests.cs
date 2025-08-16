@@ -480,6 +480,7 @@ namespace ConwaysGameOfLife.Services.UnitTests
                 .Select(lp => new Point(lp.X, lp.Y)).ToList();
             CollectionAssert.AreEquivalent(expected, dbLivePoints);
         }
+
         [Test]
         public void Transition_SeedWithToadPattern_TransitionsCorrectly()
         {
@@ -531,6 +532,66 @@ namespace ConwaysGameOfLife.Services.UnitTests
             expected = initialLivePoints;
 
             Assert.That(result.Count, Is.EqualTo(6));
+            CollectionAssert.AreEquivalent(expected, result);
+
+            // Also check that the database reflects the new state.
+            dbLivePoints = conwaysGameOfLifeDbContext.LivePoints.Where(lp => lp.BoardId == boardId)
+                .Select(lp => new Point(lp.X, lp.Y)).ToList();
+            CollectionAssert.AreEquivalent(expected, dbLivePoints);
+        }
+        [Test]
+        public void Transition_SeedWithBeaconPattern_TransitionsCorrectly()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeServices>>();
+            var configurationMock = new Mock<IConfiguration>();
+            var conwaysGameOfLifeServicesInstance = new ConwaysGameOfLifeServices(loggerMock.Object, configurationMock.Object, conwaysGameOfLifeDbContext);
+
+            // Toad pattern (Oscillator)
+            var initialLivePoints = new List<Point>
+            {
+                new Point(2, 0),
+                new Point(3, 0),
+                new Point(2, 1),
+                new Point(3, 1),
+                new Point(0, 2),
+                new Point(1, 2),
+                new Point(0, 3),
+                new Point(1, 3)
+            };
+            var boardId = conwaysGameOfLifeServicesInstance.Seed(initialLivePoints);
+
+            // Act
+            var result = conwaysGameOfLifeServicesInstance.Transition(boardId, 1);
+
+            // Assert
+            var expected = new List<Point>
+            {
+                new Point(2, 0),
+                new Point(3, 0),
+                new Point(3, 1),
+                new Point(0, 2),
+                new Point(0, 3),
+                new Point(1, 3)
+            };
+
+            Assert.That(result.Count, Is.EqualTo(6));
+            CollectionAssert.AreEquivalent(expected, result);
+
+            // Also check that the database reflects the new state.
+            var dbLivePoints = conwaysGameOfLifeDbContext.LivePoints.Where(lp => lp.BoardId == boardId)
+                .Select(lp => new Point(lp.X, lp.Y)).ToList();
+            CollectionAssert.AreEquivalent(expected, dbLivePoints);
+
+            // Act
+            result = conwaysGameOfLifeServicesInstance.Transition(boardId, 1);
+
+            // Assert
+            // After two iterations, toad should return back to orginal pattern.
+            expected = initialLivePoints;
+
+            Assert.That(result.Count, Is.EqualTo(8));
             CollectionAssert.AreEquivalent(expected, result);
 
             // Also check that the database reflects the new state.
