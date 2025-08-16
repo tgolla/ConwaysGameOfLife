@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Drawing;
 using System.Reflection;
 
 namespace ConwaysGameOfLife.Services.UnitTests

@@ -1,8 +1,6 @@
 ﻿using ConwaysGameOfLife.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Client;
-using System.Drawing;
 
 namespace ConwaysGameOfLife.Services
 {

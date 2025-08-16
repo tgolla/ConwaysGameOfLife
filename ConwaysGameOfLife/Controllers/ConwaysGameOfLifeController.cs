@@ -1,6 +1,5 @@
 using ConwaysGameOfLife.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Drawing;
 using System.Net;
 
 namespace ConwaysGameOfLife.Controllers
@@ -58,7 +57,6 @@ namespace ConwaysGameOfLife.Controllers
             }
         }
 
-
         /// <summary>
         /// Retrieves the state of a game board after applying the specified number of iterations.
         /// </summary>
@@ -84,17 +82,20 @@ namespace ConwaysGameOfLife.Controllers
             }
         }
 
-        /// <summary>
-        /// Handles HTTP DELETE requests for this endpoint. This endpoint is not implemented yet.
-        /// </summary>
-        /// <returns>An <see cref="IActionResult"/> indicating that the endpoint is not implemented. The response has a status
-        /// code of <see cref="HttpStatusCode.NotImplemented"/> (501) and includes a message stating that the endpoint
-        /// is not implemented.
-        /// </returns>
+
         [HttpDelete]
-        public IActionResult Delete()
+        public IActionResult Delete([FromQuery] Guid boardId)
         {
-            return StatusCode((int)HttpStatusCode.NotImplemented, "This endpoint is not implemented yet.");
+            try
+            {
+                var finalPoints = conwaysGameOfLifeService.End(boardId);
+                return Ok(finalPoints);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error ending game session.");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.ToString());
+            }
         }
     }
 }

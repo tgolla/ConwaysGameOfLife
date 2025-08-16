@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using System.Drawing;
-
 namespace ConwaysGameOfLife.Services
 {
     /// <summary>
