@@ -14,7 +14,7 @@ namespace ConwaysGameOfLife.Services
     /// game states (Seed), applying game rules (Transition), and managing the simulation lifecycle (End). Use this
     /// class to interact with and manipulate the game grid and its evolution over time. 
     /// </remarks>
-    public class ConwaysGameOfLifeService
+    public class ConwaysGameOfLifeService : IConwaysGameOfLifeService
     {
         private readonly ConwaysGameOfLifeSettings conwaysGameOfLifeSettings;
         private readonly ConwaysGameOfLifeApiDbContext conwaysGameOfLifeApiDbContext;
