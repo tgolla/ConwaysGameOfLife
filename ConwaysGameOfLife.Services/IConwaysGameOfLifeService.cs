@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System.Drawing;
 
 namespace ConwaysGameOfLife.Services
@@ -21,5 +22,12 @@ namespace ConwaysGameOfLife.Services
         /// <param name="iterations">The number of iterations to simulate. Must be a non-negative integer.</param>
         /// <returns>A list of <see cref="Point"/> objects representing the coordinates of all live points after the simulation.</returns>
         List<Point> Transition(Guid boardId, uint iterations);
+
+        /// <summary>
+        /// Ends the current game session for the specified board and retrieves the final positions of all points.
+        /// </summary>
+        /// <param name="boardId">The unique identifier of the board whose game session is to be ended.</param>
+        /// <returns>A list of <see cref="Point"/> objects representing the final positions on the board. The list will be empty if no points are present.</returns>
+        List<Point> End(Guid boardId);        
     }
 }
