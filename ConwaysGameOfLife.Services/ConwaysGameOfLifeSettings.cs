@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace ConwaysGameOfLife.Services
 {
-    internal class ConwaysGameOfLife
+    /// <summary>
+    /// Conway's Game of Life service settings stored in AppSettings.
+    /// </summary>
+    public class ConwaysGameOfLifeSettings
     {
     }
 }

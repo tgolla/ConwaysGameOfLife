@@ -13,7 +13,7 @@ namespace ConwaysGameOfLife.Services
     /// game states (Seed), applying game rules (Transition), and managing the simulation lifecycle (End). Use this
     /// class to interact with and manipulate the game grid and its evolution over time. 
     /// </remarks>
-    public class ConwaysGameOfLifeServices
+    public class ConwaysGameOfLifeService
     {
         private readonly ConwaysGameOfLifeApiDbContext conwaysGameOfLifeApiDbContext;
 
@@ -21,12 +21,12 @@ namespace ConwaysGameOfLife.Services
         private HashSet<BoardPoint> deadNeighbours = new HashSet<BoardPoint>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConwaysGameOfLifeServices"/> class.
+        /// Initializes a new instance of the <see cref="ConwaysGameOfLifeService"/> class.
         /// </summary>
         /// <remarks>
         /// This constructor sets up the necessary services for managing and simulating Conway's Game of Life.
         /// </remarks>
-        public ConwaysGameOfLifeServices(ILogger<ConwaysGameOfLifeServices> logger, IConfiguration configuration, ConwaysGameOfLifeApiDbContext conwaysGameOfLifeApiDbContext)
+        public ConwaysGameOfLifeService(ILogger<ConwaysGameOfLifeService> logger, IConfiguration configuration, ConwaysGameOfLifeApiDbContext conwaysGameOfLifeApiDbContext)
         {
             this.conwaysGameOfLifeApiDbContext = conwaysGameOfLifeApiDbContext; // Fix: assign parameter to field
             livePoints = new HashSet<BoardPoint>();
@@ -143,7 +143,7 @@ namespace ConwaysGameOfLife.Services
             // Update the deadNeighbours set with the newly counted dead neighbours.
             deadNeighbours = updatedDeadNeighbours;
         }
-        
+
         private void TransitionOnce()
         {
             CountNeighbours();
@@ -179,6 +179,12 @@ namespace ConwaysGameOfLife.Services
         /// <returns>A list of <see cref="Point"/> objects representing the coordinates of all live points after the simulation.</returns>
         public List<Point> Transition(Guid boardId, uint iterations)
         {
+            // Get the current live points for the specified boardId.       
+            livePoints = conwaysGameOfLifeApiDbContext.LivePoints
+                .Where(lp => lp.BoardId == boardId)
+                .Select(lp => new BoardPoint(lp.X, lp.Y))
+                .ToHashSet();
+
             for (uint i = 0; i < iterations; i++)
             {
                 // If there are no live points left, we can stop the simulation early.
@@ -202,6 +208,45 @@ namespace ConwaysGameOfLife.Services
             conwaysGameOfLifeApiDbContext.LivePoints.AddRange(livePointEntities);
 
             conwaysGameOfLifeApiDbContext.SaveChanges();
+
+            return livePoints.Select(p => new Point(p.X, p.Y)).ToList();
+        }
+
+
+        public List<Point> End(Guid boardId)
+        {
+            // Get the current live points for the specified boardId.       
+            livePoints = conwaysGameOfLifeApiDbContext.LivePoints
+                .Where(lp => lp.BoardId == boardId)
+                .Select(lp => new BoardPoint(lp.X, lp.Y))
+                .ToHashSet();
+
+            uint iterations = 1000; // TODO: Make this configurable.
+
+            for (uint i = 0; i < iterations; i++)
+            {
+                // If there are no live points left, we can stop the simulation early.
+                if (livePoints.Count == 0)
+                    break;
+
+                TransitionOnce();
+
+                //TODO: Compare count(population) for change over configured iteration.
+            }
+
+            // Clear the live points from the database for the specified boardId.
+            conwaysGameOfLifeApiDbContext.LivePoints.RemoveRange(conwaysGameOfLifeApiDbContext.LivePoints.Where(x => x.BoardId == boardId));
+
+            conwaysGameOfLifeApiDbContext.SaveChanges();
+
+            // Remove the board from the database.
+            var board = conwaysGameOfLifeApiDbContext.Boards.Find(boardId);
+
+            if (board != null)
+            {
+                conwaysGameOfLifeApiDbContext.Boards.Remove(board);
+                conwaysGameOfLifeApiDbContext.SaveChanges();
+            }
 
             return livePoints.Select(p => new Point(p.X, p.Y)).ToList();
         }

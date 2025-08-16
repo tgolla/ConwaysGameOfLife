@@ -5,7 +5,7 @@ namespace ConwaysGameOfLife.Services
     /// <summary>
     /// Defines the contract for Conway's Game of Life services.
     /// </summary>
-    public interface IConwaysGameOfLifeServices
+    public interface IConwaysGameOfLifeService
     {
         /// <summary>
         /// Initializes (seeds) the set of live points for the simulation.

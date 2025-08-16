@@ -52,7 +52,7 @@ The universe of the Game of Life is [an infinite, two-dimensional orthogonal gri
 
 The initial pattern constitutes the *seed* of the system. The first generation is created by applying the above rules simultaneously to every cell in the seed, live or dead; births and deaths occur simultaneously, and the discrete moment at which this happens is sometimes called a *tick*.[[nb 1\]](https://en.wikipedia.org/wiki/Conway's_Game_of_Life#cite_note-7) Each generation is a *[pure function](https://en.wikipedia.org/wiki/Pure_function)* of the preceding one. The rules continue to be applied repeatedly to create further generations. Ref:  https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life  
 
-### ConwaysGameOfLifeServices
+### ConwaysGameOfLifeService
 
 Conway's Game of Life services layer provides the following functionality.
 
