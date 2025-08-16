@@ -729,7 +729,41 @@ namespace ConwaysGameOfLife.Services.UnitTests
             Assert.IsNull(conwaysGameOfLifeDbContext.Boards.Find(boardId));
         }
 
-        //TODO: Add test for Pulsar, R-pentomino, Diehard, and Acorn.
+        [Test]
+        public void End_RpentominoPattern_EndsEarlyWithBlock()
+        {
+            // Arrange
+            var conwaysGameOfLifeDbContext = CreateInMemoryDbContext();
+            var loggerMock = new Mock<ILogger<ConwaysGameOfLifeService>>();
+            var configuration = CreateConfiguration();
+            var ConwaysGameOfLifeServiceInstance = new ConwaysGameOfLifeService(loggerMock.Object, configuration, conwaysGameOfLifeDbContext);
+            var boardId = Guid.NewGuid();
+
+            conwaysGameOfLifeDbContext.Boards.Add(new Board { Id = boardId, Expires = DateTime.UtcNow });
+
+            // R-pentomino pattern
+            conwaysGameOfLifeDbContext.LivePoints.AddRange(new[] {
+                            new LivePoint { BoardId = boardId, X = 1, Y = 0 },
+                            new LivePoint { BoardId = boardId, X = 0, Y = 2 },
+                            new LivePoint { BoardId = boardId, X = 1, Y = 2 },
+                            new LivePoint { BoardId = boardId, X = 1, Y = 3 },
+                            new LivePoint { BoardId = boardId, X = 2, Y = 3 }
+                        });
+
+            conwaysGameOfLifeDbContext.SaveChanges();
+
+            // Act
+            var result = ConwaysGameOfLifeServiceInstance.End(boardId);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.That(result.Count, Is.EqualTo(7));
+            var expected = new HashSet<Point> { new(1, 4), new(0, 1), new(2, 3), new(0, 4), new(-1, 2), new(1, 2), new(-1, 3) };
+            CollectionAssert.AreEquivalent(expected, result);
+            Assert.IsNull(conwaysGameOfLifeDbContext.Boards.Find(boardId));
+        }
+
+        //TODO: Add test for Pulsar, Diehard, and Acorn.
 
         [Test]
         public void End_MaxGenerationReached_ThrowsInvalidOperationException()

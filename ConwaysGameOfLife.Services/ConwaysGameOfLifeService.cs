@@ -268,7 +268,7 @@ namespace ConwaysGameOfLife.Services
                         if (previousPopulation.TryGetValue(period, out var previousPopulationCount) && livePoints.Count == previousPopulationCount)
                         {
                             stablePopulationIterations[period]++;
-                            if (stablePopulationIterations[period] >= conwaysGameOfLifeSettings.StablePopulationIterations)
+                            if (stablePopulationIterations[period] >= conwaysGameOfLifeSettings.StablePopulationIterations / period)
                             {
                                 // Population is stable, we can end the simulation.
                                 maximunGenerationReached = false;
