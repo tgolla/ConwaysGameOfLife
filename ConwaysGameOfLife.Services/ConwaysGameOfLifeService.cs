@@ -53,7 +53,7 @@ namespace ConwaysGameOfLife.Services
             var board = new Board
             {
                 Id = boardId,
-                Expires = DateTime.UtcNow
+                Expires = DateTime.UtcNow.AddDays(conwaysGameOfLifeSettings.ExpiresInXDays)
             };
 
             conwaysGameOfLifeApiDbContext.Boards.Add(board);

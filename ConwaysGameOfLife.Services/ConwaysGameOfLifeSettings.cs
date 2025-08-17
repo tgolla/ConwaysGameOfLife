@@ -13,6 +13,11 @@ namespace ConwaysGameOfLife.Services
     public class ConwaysGameOfLifeSettings
     {
         /// <summary>
+        /// This is the number of days that a game will be allowed to exist before it expires and is removed from the database.
+        /// </summary>
+        public uint ExpiresInXDays { get; set; }
+
+        /// <summary>
         /// This is the maximum number of generations before the game ends preventing the game from running indefinitely.
         /// This value does not affect the number of trasitions that can be made in the game, only the number of generations
         /// executed when ending the game.
