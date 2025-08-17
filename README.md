@@ -5,7 +5,7 @@
 
 ## Objective
 
-Implement a RESTful API for Conway's Game of Life. Your solution should be designed with  production readiness in mind. Ref:  https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life  
+Implement a RESTful API for Conway's Game of Life. Your solution should be designed with production readiness in mind. Ref:  https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life  
 
 ## Functional Requirements
 
@@ -18,7 +18,7 @@ The API should include (at a minimum) the following endpoints:
 
 ## Database
 
-The service must persist board states so they are not lost if the application is restarted or crashes. This requirement eliminates persisting the board state through any type of memory storage such as server sessions or client memory. The following database tables will be used to maintain board states.
+The service must persist the board state so they are not lost if the application is restarted or crashes. This requirement eliminates persisting the board state through any type of memory storage such as server sessions or client memory. The following database tables will be used to maintain the board state.
 
 ### Boards Table
 
@@ -66,11 +66,89 @@ The transition increments through 1 or more generations by applying the above ru
 
 #### End
 
-Ending the game increments through 1 or more generations until such time as it can return the final stable state of the board (i.e., when it no longer changes or cycles). If the board does not reach a stable conclusion within a reasonable number of iterations an error is returned. In either case the last iteration of live points is returned. Upon completion the game board is deleted from the database. 
+Ending the game increments through 1 or more generations (`MaximunGenerationBeforeEnding`) until such time as it can return the final stable state of the board (i.e., when it no longer changes or cycles). If the board does not reach a stable conclusion within a reasonable number of iterations an error is returned. In either case the last iteration of live points is returned. Upon completion the game board is deleted from the database. 
 
 ## APIs
 
-TBD
+### POST /ConwaysGameOfLife
+
+The POST method of `/ConwaysGameOfLife` is used to create a new game. The method seeds the board with the array of points passed in the body (JSON) and returns a Guid board id.
+
+```
+POST https://localhost:7034/ConwaysGameOfLife
+```
+
+Example Body - Block Pattern (Still Life)
+
+```
+[
+  {
+    "x": 0,
+    "y": 0
+  },
+  {
+    "x": 1,
+    "y": 0
+  },
+  {
+    "x": 0,
+    "y": 1
+  },
+  {
+    "x": 1,
+    "y": 1
+  }
+]
+```
+
+Blinker Pattern (Oscillator)
+
+```
+[
+  {
+    "x": 0,
+    "y": 0
+  },
+  {
+    "x": 1,
+    "y": 0
+  },
+  {
+    "x": 2,
+    "y": 0
+  }
+]
+```
+
+### Get /ConwaysGameOfLife
+
+The GET method of `/ConwaysGameOfLife` transitions the game board form one generation to the next. The method is called with the board id.
+
+```
+GET https://localhost:7034/ConwaysGameOfLife?boardid=b251ff1b-348d-45a7-87c8-fe5c1b5ea553
+```
+
+The method can iterate through one or more generations by passing an optional iteration count.
+
+```
+GET https://localhost:7034/ConwaysGameOfLife?boardid=b251ff1b-348d-45a7-87c8-fe5c1b5ea553?iterations=15
+```
+
+If you want to retrieve the current generation without first transitioning to the next generation set the iterations count to zero.
+
+```
+GET https://localhost:7034/ConwaysGameOfLife?boardid=b251ff1b-348d-45a7-87c8-fe5c1b5ea553?iterations=0
+```
+
+### Delete /ConwaysGameOfLife
+
+The DELETE method of `/ConwaysGameOfLife` ends the game (no longer changing or cycling) deleting it from the database and attempts to return the last generation. If the game can not be ended an error is returned. The method is called with the board id. 
+
+```
+DELETE https://localhost:7034/ConwaysGameOfLife?boardid=b251ff1b-348d-45a7-87c8-fe5c1b5ea553
+```
+
+A Postman collection `Conway's Game of Life.postman_collection.json` to test execution is located in the root folder.
 
 ## Project Setup
 
@@ -90,15 +168,17 @@ This command should be run is Visual Studio using the Package Manager Console wi
 
 To do this in Visual Studio right click the `ConwaysGameOfLife` project in Solutions Explorer view and select Manage User Secrets. Paste in the connection string JSON replacing the User Id and Password with a SQL Server Express user.
 
-It may also be necessary to add the folder `log` to the `ConwaysGameOfLife` project folder. The folder is the location where Serilog is configured to store log files in the development environment.
+It may also be necessary to add the `logs` folder to the `ConwaysGameOfLife` project folder. The folder is the location where Serilog is configured to store log files in the development environment.
 
 ## Future Enhancements
 
 The follow future enhancements for the project have been noted.
 
+- Review with team possible end game logic possibilities.
+- Refactor service layer (duplicate code, single responsibility)
 - Add function testing for the APIs with Playwright.
 - Add more pattern unit tests.
-- Review with team possible end game logic.
+- Add API call to clean out expired games.
 - Build graphic frontend.
 
 
@@ -107,5 +187,6 @@ The follow future enhancements for the project have been noted.
 | Date      | Author        | Modification           |
 | --------- | ------------- | ---------------------- |
 | 8/14/2025 | Terence Golla | Initial Draft Document |
+| 8/17/2025 | Terence Golla | Release 1.0            |
 |           |               |                        |
 
