@@ -53,7 +53,7 @@ namespace ConwaysGameOfLife.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error seeding live points.");
-                return StatusCode((int)HttpStatusCode.InternalServerError, "An error occurred while seeding live points.");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -78,7 +78,7 @@ namespace ConwaysGameOfLife.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error transitioning game board to next generation.");
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.ToString());
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -102,7 +102,7 @@ namespace ConwaysGameOfLife.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error ending game session.");
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.ToString());
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }
