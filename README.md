@@ -191,7 +191,7 @@ This project provides an excellent opportunity to demonstrate Visual Studio code
 
 For general information check out the https://learn.microsoft.com/ article [Determine code testing coverage - Visual Studio (Windows) | Microsoft Learn](https://learn.microsoft.com/en-us/visualstudio/test/using-code-coverage-to-determine-how-much-code-is-being-tested?view=visualstudio&tabs=csharp).
 
-For an actual demo script check out [Visual Studio Code Coverage Demo](../docs/Visual Studio Code Coverage Demo.md) in the `/docs` folder.
+For an actual demo script check out [Visual Studio Code Coverage Demo](docs/Visual%20Studio%20Code%20Coverage%20Demo.md) in the `/docs` folder.
 
 ### .NET 10 upgrade (Swagger options)
 
