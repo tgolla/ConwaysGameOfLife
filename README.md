@@ -181,12 +181,29 @@ The follow future enhancements for the project have been noted.
 - Add API call to clean out expired games.
 - Build graphic frontend.
 
+## Segue
+
+While this project originated as a coding challenge, it has also proven useful as a training example. The following such examples have been implemented.
+
+### Code Coverage
+
+This project provides an excellent opportunity to demonstrate Visual Studio code coverage which was recently added to the 2026 Community, and Professional editions. Prior to this it was only available in Enterprise. Live execution of test is still only available in Enterprise.
+
+For general information check out the https://learn.microsoft.com/ article [Determine code testing coverage - Visual Studio (Windows) | Microsoft Learn](https://learn.microsoft.com/en-us/visualstudio/test/using-code-coverage-to-determine-how-much-code-is-being-tested?view=visualstudio&tabs=csharp).
+
+For an actual demo script check out [Visual Studio Code Coverage Demo](docs/api.md) in the `/docs` folder.
+
+### .NET 10 upgrade (Swagger options)
+
+*To Be Completed in the a future release.*
+
 
 ## History
 
-| Date      | Author        | Modification           |
-| --------- | ------------- | ---------------------- |
-| 8/14/2025 | Terence Golla | Initial Draft Document |
-| 8/17/2025 | Terence Golla | Release 1.0            |
-|           |               |                        |
+| Date      | Author        | Modification                                 |
+| --------- | ------------- | -------------------------------------------- |
+| 8/14/2025 | Terence Golla | Initial Draft Document                       |
+| 8/17/2025 | Terence Golla | Release 1.0                                  |
+| 6/4/2026  | Terence Golla | Added Segue documentation for code coverage. |
+|           |               |                                              |
 
