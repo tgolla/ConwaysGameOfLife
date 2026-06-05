@@ -193,7 +193,19 @@ For general information check out the https://learn.microsoft.com/ article [Dete
 
 For an actual demo script check out [Visual Studio Code Coverage Demo](../docs/Visual Studio Code Coverage Demo.md) in the `/docs` folder.
 
-### .NET 10 upgrade (Swagger options)
+### .NET 10 Upgrade (Swagger Options)
+
+Starting with .NET 9, ASP.NET Core no longer includes Swagger by default in web API templates. And with .NET 10, Microsoft has doubled down on native OpenAPI support - now generating OpenAPI 3.1 documents out of the box with improved transformer APIs and better tooling. If you’re wondering what changed, whether Swagger is truly dead (spoiler: it’s not), and what the best alternatives are, keep reading to find out! (Ref: [ASP.NET Core Dropped Swagger - Here’s What Replaced It in .NET 10 - codewithmukesh](https://codewithmukesh.com/blog/dotnet-swagger-alternatives-openapi/))
+
+> **TL;DR.** *.NET 10 ships with native OpenAPI 3.1 document generation via the* `Microsoft.AspNetCore.OpenApi` *package - no Swashbuckle needed. The recommended stack for .NET 10 Web APIs is:* **`Microsoft.AspNetCore.OpenApi` for document generation + Scalar for the UI***. Scalar (*`Scalar.AspNetCore` *2.14.x) is the modern Swagger UI replacement - cleaner, faster, with better request/response visualization and dark mode by default. Swashbuckle 10.x still works on .NET 10 but is no longer in the default template. Use NSwag if you need client SDK generation; use Redoc if you publish public docs. The mistake most teams make is keeping Swashbuckle on new .NET 10 projects out of habit - the native pipeline is genuinely better.* (Ref: [ASP.NET Core Dropped Swagger - Here’s What Replaced It in .NET 10 - codewithmukesh](https://codewithmukesh.com/blog/dotnet-swagger-alternatives-openapi/))
+
+#### So what exactly has been done to this code challenge?
+
+1. The `TargetFramework` in each of the project files has been updated to .NET 10.
+
+   `<TargetFramework>net10.0</TargetFramework>`
+
+2. 
 
 *To Be Completed in the a future release.*
 
