@@ -193,13 +193,9 @@ For general information check out the https://learn.microsoft.com/ article [Dete
 
 For an actual demo script check out [Visual Studio Code Coverage Demo](docs/Visual%20Studio%20Code%20Coverage%20Demo.md) in the `/docs` folder.
 
-### .NET 10 Upgrade (Swagger Options)
+### .NET 10 Upgrade
 
-Starting with .NET 9, ASP.NET Core no longer includes Swagger by default in web API templates. And with .NET 10, Microsoft has doubled down on native OpenAPI support - now generating OpenAPI 3.1 documents out of the box with improved transformer APIs and better tooling. If you’re wondering what changed, whether Swagger is truly dead (spoiler: it’s not), and what the best alternatives are, keep reading to find out! (Ref: [ASP.NET Core Dropped Swagger - Here’s What Replaced It in .NET 10 - codewithmukesh](https://codewithmukesh.com/blog/dotnet-swagger-alternatives-openapi/))
-
-> **TL;DR.** *.NET 10 ships with native OpenAPI 3.1 document generation via the* `Microsoft.AspNetCore.OpenApi` *package - no Swashbuckle needed. The recommended stack for .NET 10 Web APIs is:* **`Microsoft.AspNetCore.OpenApi` for document generation + Scalar for the UI***. Scalar (*`Scalar.AspNetCore` *2.14.x) is the modern Swagger UI replacement - cleaner, faster, with better request/response visualization and dark mode by default. Swashbuckle 10.x still works on .NET 10 but is no longer in the default template. Use NSwag if you need client SDK generation; use Redoc if you publish public docs. The mistake most teams make is keeping Swashbuckle on new .NET 10 projects out of habit - the native pipeline is genuinely better.* (Ref: [ASP.NET Core Dropped Swagger - Here’s What Replaced It in .NET 10 - codewithmukesh](https://codewithmukesh.com/blog/dotnet-swagger-alternatives-openapi/))
-
-#### So what exactly has been done to this code challenge?
+The following are the steps need to upgrade this project from .NET 8 to 10. While Microsoft has dropped Swashbuckle from the newer .NET 10 templates, it can still be used and in this case simply upgraded in place.
 
 1. The `TargetFramework` in each of the project files has been updated to .NET 10.
 
@@ -217,6 +213,47 @@ Starting with .NET 9, ASP.NET Core no longer includes Swagger by default in web 
 
 6. Use `dotnet solution migrate` to create a `.slnx` solution file and delete the old `.sln`  file.
 
+### Swagger Alternatives
+
+Starting with .NET 9, ASP.NET Core no longer includes Swagger by default in web API templates. And with .NET 10, Microsoft has doubled down on native OpenAPI support - now generating OpenAPI 3.1 documents out of the box with improved transformer APIs and better tooling. If you’re wondering what changed, whether Swagger is truly dead (spoiler: it’s not), and what the best alternatives are, keep reading to find out! (Ref: [ASP.NET Core Dropped Swagger - Here’s What Replaced It in .NET 10 - codewithmukesh](https://codewithmukesh.com/blog/dotnet-swagger-alternatives-openapi/))
+
+> **TL;DR.** *.NET 10 ships with native OpenAPI 3.1 document generation via the* `Microsoft.AspNetCore.OpenApi` *package - no Swashbuckle needed. The recommended stack for .NET 10 Web APIs is:* **`Microsoft.AspNetCore.OpenApi` for document generation + Scalar for the UI***. Scalar (*`Scalar.AspNetCore` *2.14.x) is the modern Swagger UI replacement - cleaner, faster, with better request/response visualization and dark mode by default. Swashbuckle 10.x still works on .NET 10 but is no longer in the default template. Use NSwag if you need client SDK generation; use Redoc if you publish public docs. The mistake most teams make is keeping Swashbuckle on new .NET 10 projects out of habit - the native pipeline is genuinely better.* (Ref: [ASP.NET Core Dropped Swagger - Here’s What Replaced It in .NET 10 - codewithmukesh](https://codewithmukesh.com/blog/dotnet-swagger-alternatives-openapi/))
+
+The following alternatives are all implemented in this example in addition to the original Swashbuckle implementation.
+
+#### Microsoft OpenApi
+
+Microsoft's .NET 10 recommendation has dropped Swashbuckle, in particular `.AddSwaggerGen()` and `app.MapSwagger();` which generate an Open API JSON document in favor of Microsoft's `Microsoft.AspNetCore.OpenApi`. Microsoft's recommendation goes as far as to suggest that you should not even expose Open API JSON documentation.
+
+This is obviously a product decision. The following step outline the steps taken to add Microsoft's Open API document generation.
+
+1. Add the `Microsoft.AspNetCore.OpenApi` package to the project.
+2. In `Program.cs` add `builder.Services.AddOpenApi();` after `builder.Services.AddControllers();`.
+3. In `Program.cs` add `app.MapOpenApi();` after `var app = builder.Build();`.
+
+These to step are all that is necessary to generate the Open API JSON document. Run the application. You will of course be taken to the newer v10 implementation of the Swashbuckle Swagger page. Now browse to ` /openapi/v1.json` to see the Microsoft Open API JSON document. Note the under the covers Swashbuckle uses a current .NET 10 version of `Microsoft.OpenApi`, still based on the version the Open API JSON file version may vary.
+
+The most notable thing about Microsoft's drop of Swashbuckle from it's templates is that while replacing the Open API JSON document generation, they don't offer a UI solution. The following are possible replacements for the UI.
+
+#### SwaggerUI
+
+*To Be Completed in the a future release.*
+
+#### ReDoc
+
+*To Be Completed in the a future release.*
+
+#### NSwag
+
+*To Be Completed in the a future release.*
+
+#### Scaler
+
+*To Be Completed in the a future release.*
+
+#### Summary 
+
+No mater which UI you decide to use, you should seriously look at dropping Swashbuckle's Open API JSON document generator in favor of Microsoft's.
 
 ## History
 
