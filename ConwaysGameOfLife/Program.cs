@@ -3,7 +3,7 @@ using ConwaysGameOfLife.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using NetCore.AutoRegisterDi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
@@ -12,6 +12,11 @@ using TGolla.Swashbuckle.AspNetCore.SwaggerGen;
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigurationManager configuration = builder.Configuration;
+
+if (!builder.Environment.IsProduction())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 var assembliesToScan = new[]
 {
@@ -32,7 +37,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter(); // Only necessary wi
 builder.Services.AddDbContext<ConwaysGameOfLifeApiDbContext>(options =>
      options.UseSqlServer(configuration.GetConnectionString("ConwaysGameOfLifeApiDb")));
 
-builder.Services.AddApplicationInsightsTelemetry();
+//builder.Services.AddApplicationInsightsTelemetry();
 
 // Add authentication and authorization here.
 
@@ -54,8 +59,6 @@ builder.Services.AddSwaggerGen(delegate (SwaggerGenOptions options)
 
 builder.Services.AddControllers();
 
-builder.Services.AddEndpointsApiExplorer();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -73,7 +76,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwagger();
+app.MapSwagger();
 app.UseSwaggerUI();
 
 app.MapControllers();

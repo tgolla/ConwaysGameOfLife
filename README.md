@@ -205,17 +205,25 @@ Starting with .NET 9, ASP.NET Core no longer includes Swagger by default in web 
 
    `<TargetFramework>net10.0</TargetFramework>`
 
-2. 
+   And confirmed build.
 
-*To Be Completed in the a future release.*
+2. Upgraded packages for each of the projects.
+
+3. Modify `using Microsoft.OpenApi.Models;` in `Programs.cs` to `using Microsoft.OpenApi;`. 
+
+4. Added `using NUnit.Framework.Legacy;` to `ConwaysGameOfLife.Services.UnitTests` for `CollectionAssert.AreEquivalent(expected, result);` which nUnit now considers legacy code ([NUnit2049: Consider using Assert.That(...) instead of CollectionAssert(...)](https://github.com/nunit/nunit.analyzers/blob/master/documentation/NUnit2049.md)).
+
+5. In `Program.cs` remove `builder.Services.AddEndpointsApiExplorer();` and change `app.UseSwagger();` to `app.MapSwagger();`.
+
+6. Use `dotnet solution migrate` to create a `.slnx` solution file and delete the old `.sln`  file.
 
 
 ## History
 
-| Date      | Author        | Modification                                 |
-| --------- | ------------- | -------------------------------------------- |
-| 8/14/2025 | Terence Golla | Initial Draft Document                       |
-| 8/17/2025 | Terence Golla | Release 1.0                                  |
-| 6/4/2026  | Terence Golla | Added Segue documentation for code coverage. |
-|           |               |                                              |
+| Date      | Author        | Modification                                                 |
+| --------- | ------------- | ------------------------------------------------------------ |
+| 8/14/2025 | Terence Golla | Initial Draft Document                                       |
+| 8/17/2025 | Terence Golla | Release 1.0                                                  |
+| 6/4/2026  | Terence Golla | Added Segue documentation for code coverage.                 |
+| 6/11/2026 | Terence Golla | Added Segue documentation for .NET 10 Upgrade (Swagger Options) and upgraded to .NET 10. |
 

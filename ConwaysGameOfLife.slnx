@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="ConwaysGameOfLife.Data/ConwaysGameOfLife.Data.csproj" />
+  <Project Path="ConwaysGameOfLife.Services.UnitTests/ConwaysGameOfLife.Services.UnitTests.csproj" />
+  <Project Path="ConwaysGameOfLife.Services/ConwaysGameOfLife.Services.csproj" />
+  <Project Path="ConwaysGameOfLife/ConwaysGameOfLife.csproj" />
+</Solution>
