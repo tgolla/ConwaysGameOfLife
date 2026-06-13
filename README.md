@@ -223,21 +223,30 @@ The following alternatives are all implemented in this example in addition to th
 
 #### Microsoft OpenApi
 
-Microsoft's .NET 10 recommendation has dropped Swashbuckle, in particular `.AddSwaggerGen()` and `app.MapSwagger();` which generate an Open API JSON document in favor of Microsoft's `Microsoft.AspNetCore.OpenApi`. Microsoft's recommendation goes as far as to suggest that you should not even expose Open API JSON documentation.
+Microsoft's .NET 10 recommendation has dropped Swashbuckle, in particular `.AddSwaggerGen()` and `app.MapSwagger();` which generate an OpenAPI JSON document in favor of Microsoft's `Microsoft.AspNetCore.OpenApi`. Microsoft's recommendation goes as far as to suggest that you should not even expose OpenAPI JSON documentation.
 
-This is obviously a product decision. The following step outline the steps taken to add Microsoft's Open API document generation.
+This is obviously a product decision. The following step outline the steps taken to add Microsoft's OpenAPI document generation.
 
 1. Add the `Microsoft.AspNetCore.OpenApi` package to the project.
 2. In `Program.cs` add `builder.Services.AddOpenApi();` after `builder.Services.AddControllers();`.
 3. In `Program.cs` add `app.MapOpenApi();` after `var app = builder.Build();`.
 
-These to step are all that is necessary to generate the Open API JSON document. Run the application. You will of course be taken to the newer v10 implementation of the Swashbuckle Swagger page. Now browse to ` /openapi/v1.json` to see the Microsoft Open API JSON document. Note the under the covers Swashbuckle uses a current .NET 10 version of `Microsoft.OpenApi`, still based on the version the Open API JSON file version may vary.
+These to step are all that is necessary to generate the OpenAPI JSON document. Run the application. You will of course be taken to the newer v10 implementation of the Swashbuckle Swagger page. Now browse to ` /openapi/v1.json` to see the Microsoft OpenAPI JSON document. Note the under the covers Swashbuckle uses a current .NET 10 version of `Microsoft.OpenApi`, still based on the version the OpenAPI JSON file version may vary.
 
-The most notable thing about Microsoft's drop of Swashbuckle from it's templates is that while replacing the Open API JSON document generation, they don't offer a UI solution. The following are possible replacements for the UI.
+The most notable thing about Microsoft's drop of Swashbuckle from it's templates is that while replacing the OpenAPI JSON document generation, they don't offer a UI solution. The following are possible replacements for the UI.
 
 #### SwaggerUI
 
-*To Be Completed in the a future release.*
+If you want to upgrade to using `Microsoft.AspNetCore.OpenApi` but continue to use the the Swashbuckle Swagger UI you will need add the Microsoft OpenApi described above and the following `app.UseSwaggerUI()` line.  The key thing to note is that the OpenAPI endpoint has been changed to `/OpenApi/v1.json`.
+
+```c#
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/OpenApi/v1.json", "Microsoft OpenAPI");
+})
+```
+
+Note that this line varies in this example adding `RoutePrefix` and a `DocumentTitle` to keep the second defined Swagger UI from defaulting to the `\swagger` URL. In the example you will need to browser to `/swaggerOpenApi`. With Swashbuckle the end point defaults to `/swagger/v1/swagger.json`.
 
 #### ReDoc
 
@@ -253,7 +262,7 @@ The most notable thing about Microsoft's drop of Swashbuckle from it's templates
 
 #### Summary 
 
-No mater which UI you decide to use, you should seriously look at dropping Swashbuckle's Open API JSON document generator in favor of Microsoft's.
+No mater which UI you decide to use, you should seriously look at dropping Swashbuckle's OpenAPI JSON document generator in favor of Microsoft's.
 
 ## History
 
@@ -263,4 +272,5 @@ No mater which UI you decide to use, you should seriously look at dropping Swash
 | 8/17/2025 | Terence Golla | Release 1.0                                                  |
 | 6/4/2026  | Terence Golla | Added Segue documentation for code coverage.                 |
 | 6/11/2026 | Terence Golla | Added Segue documentation for .NET 10 Upgrade (Swagger Options) and upgraded to .NET 10. |
+| 6/13/2026 | Terence Golla | Added SwaggerUI using Microsoft OpenApi.                     |
 

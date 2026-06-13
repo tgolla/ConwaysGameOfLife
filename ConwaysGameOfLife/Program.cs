@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using NetCore.AutoRegisterDi;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Reflection;
 using TGolla.Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -63,6 +64,8 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// This example is littered with multiple ways the generate an OpenAPI JSON file.
+// With .NeT 10 Microsoft recomends using MapOpenApi() (Microsoft.AspNetCore.OpenApi) instead of Swashbuckle.AspNetCore AddSwaggerGen() and app.MapSwagger().
 app.MapOpenApi();
 
 // Configure the HTTP request pipeline.
@@ -80,8 +83,19 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// If you do want to keep using Swashbuckle.AspNetCore you need the following lines.
 app.MapSwagger();
 app.UseSwaggerUI();
+
+// If you still want to use   but with Microsoft.AspNetCore.OpenApi added the following line
+// Note: Normally it's not necessary to define RoutePrefix as the Swagger UI will default to /swagger.
+// In this example with two defined Swagger UIs RoutePrefix is necessary to browser to the Microsoft OpenAPI at /swaggerOpenApi.
+app.UseSwaggerUI(c =>
+{
+    c.RoutePrefix = "swaggerOpenApi";
+    c.SwaggerEndpoint("/OpenApi/v1.json", "Microsoft OpenAPI");
+    c.DocumentTitle = "Microsoft OpenAPI";
+});
 
 app.MapControllers();
 
