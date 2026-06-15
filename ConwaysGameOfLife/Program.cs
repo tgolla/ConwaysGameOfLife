@@ -100,6 +100,11 @@ app.UseSwaggerUI(c =>
     c.DocumentTitle = "Microsoft OpenAPI";
 });
 
+app.UseReDoc(options =>
+{
+    options.SpecUrl = "/OpenApi/v1.json";
+});
+
 app.MapControllers();
 
 app.Run();

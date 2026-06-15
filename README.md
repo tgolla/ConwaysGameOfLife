@@ -215,7 +215,7 @@ The following are the steps need to upgrade this project from .NET 8 to 10. Whil
 
 ### Swagger Alternatives
 
-Starting with .NET 9, ASP.NET Core no longer includes Swagger by default in web API templates. And with .NET 10, Microsoft has doubled down on native OpenAPI support - now generating OpenAPI 3.1 documents out of the box with improved transformer APIs and better tooling. If you’re wondering what changed, whether Swagger is truly dead (spoiler: it’s not), and what the best alternatives are, keep reading to find out! (Ref: [ASP.NET Core Dropped Swagger - Here’s What Replaced It in .NET 10 - codewithmukesh](https://codewithmukesh.com/blog/dotnet-swagger-alternatives-openapi/))
+Starting with .NET 9, ASP.NET Core no longer includes Swagger ([domaindrivendev/Swashbuckle.AspNetCore: Swagger tools for documenting API's built on ASP.NET Core](https://github.com/domaindrivendev/Swashbuckle.AspNetCore)) by default in web API templates. And with .NET 10, Microsoft has doubled down on native OpenAPI support - now generating OpenAPI 3.1 documents out of the box with improved transformer APIs and better tooling. If you’re wondering what changed, whether Swagger is truly dead (spoiler: it’s not), and what the best alternatives are, keep reading to find out! (Ref: [ASP.NET Core Dropped Swagger - Here’s What Replaced It in .NET 10 - codewithmukesh](https://codewithmukesh.com/blog/dotnet-swagger-alternatives-openapi/))
 
 > **TL;DR.** *.NET 10 ships with native OpenAPI 3.1 document generation via the* `Microsoft.AspNetCore.OpenApi` *package - no Swashbuckle needed. The recommended stack for .NET 10 Web APIs is:* **`Microsoft.AspNetCore.OpenApi` for document generation + Scalar for the UI***. Scalar (*`Scalar.AspNetCore` *2.14.x) is the modern Swagger UI replacement - cleaner, faster, with better request/response visualization and dark mode by default. Swashbuckle 10.x still works on .NET 10 but is no longer in the default template. Use NSwag if you need client SDK generation; use Redoc if you publish public docs. The mistake most teams make is keeping Swashbuckle on new .NET 10 projects out of habit - the native pipeline is genuinely better.* (Ref: [ASP.NET Core Dropped Swagger - Here’s What Replaced It in .NET 10 - codewithmukesh](https://codewithmukesh.com/blog/dotnet-swagger-alternatives-openapi/))
 
@@ -237,7 +237,7 @@ The most notable thing about Microsoft's drop of Swashbuckle from it's templates
 
 #### SwaggerUI
 
-If you want to upgrade to using `Microsoft.AspNetCore.OpenApi` but continue to use the the Swashbuckle Swagger UI you will need add the Microsoft OpenApi described above and the following `app.UseSwaggerUI()` line.  The key thing to note is that the OpenAPI endpoint has been changed to `/OpenApi/v1.json`.
+If you want to upgrade to using `Microsoft.AspNetCore.OpenApi` but continue to use the the Swashbuckle Swagger UI you will need add the  described above and the following `app.UseSwaggerUI()` line.  The key thing to note is that the OpenAPI endpoint has been changed to `/OpenApi/v1.json`.
 
 ```c#
 app.UseSwaggerUI(c =>
@@ -250,7 +250,18 @@ Note that this line varies in this example adding `RoutePrefix` and a `DocumentT
 
 #### ReDoc
 
-*To Be Completed in the a future release.*
+Redoc ([redoc/README.md at main · Redocly/redoc](https://github.com/Redocly/redoc/blob/main/README.md#redoc-options-object)) is an open source tool for generating documentation from OpenAPI (formerly Swagger) definitions.  Is should be noted that Redoc only provides documentation. It does not allow the user to easily execute API as Swashbuckle and the other alternatives discussed do.
+
+You can add Redoc to your project by adding the `Redoc.AspNetCore` package ([NuGet Gallery | Redoc.AspNetCore 1.0.0](https://www.nuget.org/packages/Redoc.AspNetCore#readme-body-tab)) and the following lines to you `Program.cs` file.
+
+```c#
+app.UseReDoc(options =>
+{
+    options.SpecUrl = "/OpenApi/v1.json";
+});
+```
+
+See documentation ([jonashendrickx/Redoc.AspNetCore](https://github.com/jonashendrickx/Redoc.AspNetCore)) for additional customization.
 
 #### NSwag
 
