@@ -269,7 +269,15 @@ See documentation ([jonashendrickx/Redoc.AspNetCore](https://github.com/jonashen
 
 #### Scaler
 
-*To Be Completed in the a future release.*
+Scaler ([Scalar.AspNetCore](https://www.nuget.org/packages/Scalar.AspNetCore)) is an open-source NuGet package that provides a modern, interactive API documentation UI for ASP.NET Core applications. It renders beautiful API references from OpenAPI/Swagger documents, offering an alternative to tools like Swagger UI and ReDoc.
+
+You can add Scaler to your project by adding the `Scalar.AspNetCore` package ([NuGet Gallery | Scalar.AspNetCore 2.16.4](https://www.nuget.org/packages/Scalar.AspNetCore)) and the following lines to you `Program.cs` file.
+
+```c#
+app.MapScalarApiReference();
+```
+
+See [Scaler](https://scalar.com/) documentation for additional customization.
 
 #### Summary 
 

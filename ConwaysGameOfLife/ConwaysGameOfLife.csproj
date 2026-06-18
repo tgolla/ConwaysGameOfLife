@@ -20,6 +20,7 @@
     </PackageReference>
     <PackageReference Include="NetCore.AutoRegisterDi" Version="2.2.1" />
     <PackageReference Include="Redoc.AspNetCore" Version="1.0.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.16.4" />
     <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.1" />

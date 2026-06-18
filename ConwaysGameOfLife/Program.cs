@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using NetCore.AutoRegisterDi;
+using Scalar.AspNetCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Reflection;
@@ -104,6 +105,8 @@ app.UseReDoc(options =>
 {
     options.SpecUrl = "/OpenApi/v1.json";
 });
+
+app.MapScalarApiReference();
 
 app.MapControllers();
 
